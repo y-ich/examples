@@ -91,7 +91,15 @@ class ModelDataHandler {
     options.threadCount = threadCount
     do {
       // Create the `Interpreter`.
-      interpreter = try Interpreter(modelPath: modelPath, options: options)
+      var coreMLoptions = CoreMLDelegate.Options()
+      coreMLoptions.enabledDevices = .all
+      if let delegate = CoreMLDelegate(options: coreMLoptions) {
+        print("CoreML Delegate")
+        interpreter = try Interpreter(modelPath: modelPath, options: options, delegates: [delegate])
+      } else {
+        print("failed to get CoreMLDelegate")
+        return nil
+      }
       // Allocate memory for the model's input `Tensor`s.
       try interpreter.allocateTensors()
     } catch let error {
